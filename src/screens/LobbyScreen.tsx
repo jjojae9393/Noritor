@@ -15,9 +15,10 @@ interface RoomData {
 
 interface LobbyScreenProps {
   onJoinRoom: (roomId: string, role: string, name: string) => void
+  onBackToHub: () => void
 }
 
-export default function LobbyScreen({ onJoinRoom }: LobbyScreenProps) {
+export default function LobbyScreen({ onJoinRoom, onBackToHub }: LobbyScreenProps) {
   const [rooms, setRooms] = useState<[string, RoomData][]>([])
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [newRoomName, setNewRoomName] = useState('')
@@ -123,9 +124,14 @@ export default function LobbyScreen({ onJoinRoom }: LobbyScreenProps) {
 
   return (
     <div className="screen">
-      <button className="btn btn-ghost" onClick={() => setShowHelp(true)}>
-        게임 방법 알아보기
-      </button>
+      <div className="lobby-top">
+        <button className="btn btn-ghost btn-sm" onClick={onBackToHub}>
+          ← 게임 선택
+        </button>
+        <button className="btn btn-ghost btn-sm" onClick={() => setShowHelp(true)}>
+          게임 방법 알아보기
+        </button>
+      </div>
 
       {showHelp && (
         <div className="modal-overlay" onClick={() => setShowHelp(false)}>

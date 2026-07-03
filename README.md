@@ -2,6 +2,8 @@
 
 > 어른들의 놀이터 — 2인 이상 실시간 매칭 종합 게임 플랫폼
 
+**🔗 접속 주소** — [https://jjojae9393.github.io/number-baseball/](https://jjojae9393.github.io/number-baseball/)
+
 ---
 
 ## About

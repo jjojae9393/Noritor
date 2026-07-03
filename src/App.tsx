@@ -1,15 +1,16 @@
 import { useState, useRef, useCallback } from 'react'
 import { db } from './firebase'
 import { ref, update, remove, get } from 'firebase/database'
+import HubScreen from './screens/HubScreen'
 import LobbyScreen from './screens/LobbyScreen'
 import RoomScreen from './screens/RoomScreen'
 import PlayingScreen from './screens/PlayingScreen'
 import EndedScreen from './screens/EndedScreen'
 
-type Screen = 'lobby' | 'room' | 'playing' | 'ended'
+type Screen = 'hub' | 'lobby' | 'room' | 'playing' | 'ended'
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>('lobby')
+  const [screen, setScreen] = useState<Screen>('hub')
   const [roomId, setRoomId] = useState<string | null>(null)
   const [myRole, setMyRole] = useState<string | null>(null)
   const [myNumber, setMyNumber] = useState('')
@@ -18,6 +19,14 @@ export default function App() {
   const [myGuessCount, setMyGuessCount] = useState(0)
 
   const listenersRef = useRef<(() => void)[]>([])
+
+  const selectGame = useCallback((gameId: string) => {
+    if (gameId === 'baseball') setScreen('lobby')
+  }, [])
+
+  const goToHub = useCallback(() => {
+    setScreen('hub')
+  }, [])
 
   const goToRoom = useCallback((id: string, role: string, name: string) => {
     setRoomId(id)
@@ -90,12 +99,25 @@ export default function App() {
   return (
     <>
       <div className="header">
-        <h1>숫자야구⚾</h1>
-        {screen === 'lobby' && <p>방을 만들거나 참가하세요</p>}
+        {screen === 'hub' ? (
+          <>
+            <h1>노리터🎡</h1>
+            <p>게임을 선택하세요</p>
+          </>
+        ) : (
+          <>
+            <h1>숫자야구⚾</h1>
+            {screen === 'lobby' && <p>방을 만들거나 참가하세요</p>}
+          </>
+        )}
       </div>
 
+      {screen === 'hub' && (
+        <HubScreen onSelectGame={selectGame} />
+      )}
+
       {screen === 'lobby' && (
-        <LobbyScreen onJoinRoom={goToRoom} />
+        <LobbyScreen onJoinRoom={goToRoom} onBackToHub={goToHub} />
       )}
 
       {screen === 'room' && roomId && myRole && (
