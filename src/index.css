@@ -279,6 +279,7 @@ body {
 /* Lobby top nav */
 .lobby-top { display: flex; gap: 8px; }
 .lobby-top .btn { flex: 1; }
+.lobby-top .btn + .btn { margin-top: 0; }
 
 /* Room list */
 .room-list-wrap { display: flex; flex-direction: column; gap: 8px; }

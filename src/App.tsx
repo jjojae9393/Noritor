@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { db } from './firebase'
 import { ref, update, remove, get } from 'firebase/database'
 import HubScreen from './screens/HubScreen'
@@ -7,11 +7,12 @@ import RoomScreen from './screens/RoomScreen'
 import PlayingScreen from './screens/PlayingScreen'
 import EndedScreen from './screens/EndedScreen'
 import TripScreen from './screens/TripScreen'
+import { VACATION_PATH, isVacationPath } from './trip/route'
 
 type Screen = 'hub' | 'lobby' | 'room' | 'playing' | 'ended' | 'trip'
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>('hub')
+  const [screen, setScreen] = useState<Screen>(() => (isVacationPath() ? 'trip' : 'hub'))
   const [roomId, setRoomId] = useState<string | null>(null)
   const [myRole, setMyRole] = useState<string | null>(null)
   const [myNumber, setMyNumber] = useState('')
@@ -23,11 +24,25 @@ export default function App() {
 
   const selectGame = useCallback((gameId: string) => {
     if (gameId === 'baseball') setScreen('lobby')
-    if (gameId === 'trip') setScreen('trip')
+    if (gameId === 'trip') {
+      window.history.pushState(null, '', VACATION_PATH)
+      setScreen('trip')
+    }
   }, [])
 
   const goToHub = useCallback(() => {
+    if (isVacationPath()) window.history.pushState(null, '', import.meta.env.BASE_URL)
     setScreen('hub')
+  }, [])
+
+  // Keep browser back/forward in sync with the /vacation path
+  useEffect(() => {
+    const handlePopState = () => {
+      if (isVacationPath()) setScreen('trip')
+      else setScreen((prev) => (prev === 'trip' ? 'hub' : prev))
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
   }, [])
 
   const goToRoom = useCallback((id: string, role: string, name: string) => {

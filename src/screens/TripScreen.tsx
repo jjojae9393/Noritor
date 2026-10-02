@@ -3,6 +3,7 @@ import { useTripBoard } from '../trip/useTripBoard'
 import ChecklistTab from '../trip/ChecklistTab'
 import ResultTab from '../trip/ResultTab'
 import CandidateTab from '../trip/CandidateTab'
+import { getVacationUrl } from '../trip/route'
 
 const TABS = [
   { id: 'checklist', label: '체크리스트' },
@@ -30,6 +31,29 @@ function storeNickname(name: string) {
   }
 }
 
+const SHARE_TITLE = '여행 체크리스트✈️'
+const COPIED_RESET_MS = 2000
+
+async function shareVacationLink(): Promise<'shared' | 'copied' | 'cancelled'> {
+  const url = getVacationUrl()
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: SHARE_TITLE, text: '친구야! 우리 여행 취향 하나씩 맞춰보자', url })
+      return 'shared'
+    } catch (err) {
+      // User closed the share sheet; don't fall through to copying
+      if (err instanceof DOMException && err.name === 'AbortError') return 'cancelled'
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(url)
+    return 'copied'
+  } catch {
+    window.prompt('아래 링크를 복사해서 공유하세요', url)
+    return 'cancelled'
+  }
+}
+
 type TripScreenProps = {
   onBackToHub: () => void
 }
@@ -38,10 +62,17 @@ export default function TripScreen({ onBackToHub }: TripScreenProps) {
   const { members, candidates, loading, error } = useTripBoard()
   const [tab, setTab] = useState<TabId>('checklist')
   const [nickname, setNickname] = useState(loadNickname)
+  const [copied, setCopied] = useState(false)
 
   const handleNicknameChange = (name: string) => {
     setNickname(name)
     storeNickname(name)
+  }
+
+  const handleShare = async () => {
+    if ((await shareVacationLink()) !== 'copied') return
+    setCopied(true)
+    setTimeout(() => setCopied(false), COPIED_RESET_MS)
   }
 
   const renderTab = () => {
@@ -80,6 +111,9 @@ export default function TripScreen({ onBackToHub }: TripScreenProps) {
     <div className="screen">
       <div className="lobby-top">
         <button className="btn btn-ghost btn-sm" onClick={onBackToHub}>← 메뉴 선택</button>
+        <button className="btn btn-ghost btn-sm" onClick={handleShare}>
+          {copied ? '링크 복사됨!' : '🔗 링크 공유'}
+        </button>
       </div>
 
       <div className="trip-tabs">
