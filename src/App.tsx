@@ -6,8 +6,9 @@ import LobbyScreen from './screens/LobbyScreen'
 import RoomScreen from './screens/RoomScreen'
 import PlayingScreen from './screens/PlayingScreen'
 import EndedScreen from './screens/EndedScreen'
+import TripScreen from './screens/TripScreen'
 
-type Screen = 'hub' | 'lobby' | 'room' | 'playing' | 'ended'
+type Screen = 'hub' | 'lobby' | 'room' | 'playing' | 'ended' | 'trip'
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('hub')
@@ -22,6 +23,7 @@ export default function App() {
 
   const selectGame = useCallback((gameId: string) => {
     if (gameId === 'baseball') setScreen('lobby')
+    if (gameId === 'trip') setScreen('trip')
   }, [])
 
   const goToHub = useCallback(() => {
@@ -104,6 +106,11 @@ export default function App() {
             <h1>노리터🎡</h1>
             <p>게임을 선택하세요</p>
           </>
+        ) : screen === 'trip' ? (
+          <>
+            <h1>여행 체크리스트✈️</h1>
+            <p>친구야! 우리 하나씩 맞춰보자</p>
+          </>
         ) : (
           <>
             <h1>숫자야구⚾</h1>
@@ -118,6 +125,10 @@ export default function App() {
 
       {screen === 'lobby' && (
         <LobbyScreen onJoinRoom={goToRoom} onBackToHub={goToHub} />
+      )}
+
+      {screen === 'trip' && (
+        <TripScreen onBackToHub={goToHub} />
       )}
 
       {screen === 'room' && roomId && myRole && (

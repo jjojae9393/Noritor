@@ -10,6 +10,7 @@ interface Game {
 const GAMES: Game[] = [
   { id: 'baseball', name: '숫자야구', icon: '⚾', desc: '숨긴 숫자를 맞혀라', players: '2인', ready: true },
   { id: 'omok', name: '오목', icon: '⚫', desc: '먼저 다섯 목을 완성', players: '2인', ready: false },
+  { id: 'trip', name: '여행 취향', icon: '✈️', desc: '친구들과 여행 스타일 맞추기', players: '2인+', ready: true },
 ]
 
 interface HubScreenProps {
